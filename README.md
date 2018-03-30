@@ -8,10 +8,19 @@
    
 # Uruchom system
 
-   ./run.sh
+   docker-compose up
    
 # System jest dostępny
 
 - http://localhost - frontend
 - http://localhost/api/swagger-ui.html - Swagger UI
 - http://localhost/api/categories - przykładowe wywołanie REST API dla backendu
+
+# Zatrzymaj system
+
+  ^C
+  docker-compose stop
+  
+# Uwzględnij zmiany w repozytoriach
+
+  ./rebuild.sh

@@ -3,14 +3,18 @@ version: "3"
 services:
 
   backend:
-    image: openjdk:jre # yep, we need bash, no apline sorry
-    command: /be.jar
+    build: ./backend/backend
     ports:
       - "8080:8080" # QA fellows like to get to the backend straight
     volumes:
-      - ./be.jar:/be.jar
-      - ./be.conf:/be.conf
+      - ./be.jar:/be.jar:ro
+      - ./be.conf:/be.conf:ro
       - ./be-logs:/logs
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - frontend-assets:/build/build
 
   proxy:
     image: nginx:alpine
@@ -18,14 +22,17 @@ services:
     - "80:80"
     links:
       - backend
+      - frontend
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./dist-fe:/frontend
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - frontend-assets:/frontend:ro
 
 #  postgres:
 #    image: postgres
 #    volumes:
 #      - db-data:/var/lib/db
 #
-#volumes:
 #  db-data:
+
+volumes:
+  frontend-assets:

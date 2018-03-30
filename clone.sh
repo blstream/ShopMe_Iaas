@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 BE="https://github.com/blstream/ShopMe_Backend.git"
 FE="https://github.com/blstream/ShopMe_Frontend.git"
