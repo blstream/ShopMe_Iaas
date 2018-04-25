@@ -1,0 +1,60 @@
+version: "3"
+
+# TODO add let's encrypt certificates, test it
+# TODO rev-proxy for adminer /db
+# TODO adminer protect: https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/
+
+services:
+
+  backend-db:
+    image: postgres:$DB_IMAGE_PG_VERSION
+    ports:
+      - "5432:5432" # Internal use only
+    environment:
+      - POSTGRES_DB=$DB_NAME
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASS
+    volumes:
+      - db-data:/var/lib/db
+
+  adminer:
+    image: adminer
+    links:
+      - backend-db:db
+
+  # TODO run as non root user
+  backend:
+    image: $BE_IMAGE
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_HOST=localhost
+      - SERVER_PORT=3001
+      - SWAGGER_EXTERNAL_HOST=patronage2018.docker
+      - SWAGGER_EXTERNAL_URL_CTX=/api
+    ports:
+      - "3001:3001" # Internal use only
+    volumes:
+      - ./be-logs:/logs:rw
+
+  frontend:
+    image: $FE_IMAGE
+    volumes:
+      - frontend-assets:/build/build
+
+  # TODO wait for backend
+  # TODO run as non root user
+  proxy:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - backend
+      - frontend
+    volumes:
+      - ./nginx:/etc/nginx/conf.d:ro
+      - frontend-assets:/frontend:ro
+
+volumes:
+  frontend-assets:
+  db-data:

@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+
+  backend:
+    # dev on local version = H2 in file, H2 console enabled, port=8080 (see application.properties)
+    build: ./backend/backend
+    ports:
+      - "8080:8080" # QA fellows like to get to the backend straight
+    volumes:
+      - ./be-logs:/logs
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - frontend-assets:/build/build
+
+  proxy:
+    image: nginx:alpine
+    ports:
+    - "80:80"
+    links:
+      - backend
+      - frontend
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - frontend-assets:/frontend:ro
+
+volumes:
+  frontend-assets:
